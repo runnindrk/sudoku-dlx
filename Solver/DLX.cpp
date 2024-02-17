@@ -152,7 +152,6 @@ class createToroidalLinkedList
 
             while (current_col->down != current_collumn)
             {
-                //cout << "delete\n";
                 node *temp = current_col;
                 current_col = current_col->down;
                 delete temp;
