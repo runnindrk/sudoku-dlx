@@ -1,5 +1,4 @@
 #include <iostream>
-#include <cstring>
 #include <vector>
 
 // -----------------------------------------------------------
@@ -342,10 +341,8 @@ int main()
     cover_matrix.push_back({5, 6}); cover_matrix.push_back({6, 0});
     cover_matrix.push_back({6, 3});
     
-    for (int i = 0; i < 10000000; i++)
-    {
-        exactCoverDancingLinks solve(cover_matrix);
-    }
+    exactCoverDancingLinks solve(cover_matrix);
+    solve.printSolutions();
 
     return 0;
 }
