@@ -1,4 +1,4 @@
-#include "sudoku_solver.cpp"
+#include "DLX.cpp"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -8,37 +8,7 @@
 
 void benchmark()
 {
-    int num_puzzles_solved = 0;
-    float avg_number_guesses = 0;
-    string sudoku;
-    ifstream file("../Data_Sets/puzzles5_forum_hardest_1905_11+");
-
-    if (!file.is_open()) 
-        cerr << "Failed to open the file.\n";
-
-    getline(file, sudoku);
-    getline(file, sudoku);
-
-    auto start = chrono::high_resolution_clock::now();
-
-    while (getline(file, sudoku))
-    {
-        solveSudoku solve(sudoku);
-        solve.backTrackingSolver();
-        avg_number_guesses += static_cast<float>(solve.num_guesses - avg_number_guesses)/(num_puzzles_solved + 1.0);
-        num_puzzles_solved += 1; 
-        cout << num_puzzles_solved << " " << sudoku << " " << solve.num_backtrack_calls << " " << solve.num_guesses << "\n";
-    }
-
-    auto end = chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start); 
-
-    file.close();
-
-    cout << "\n";
-    cout << num_puzzles_solved << " Solved Puzzles\n";
-    cout << static_cast<float>(num_puzzles_solved)/(duration.count()*1e-6) << " Puzzles/s\n";
-    cout << avg_number_guesses << " Guesses/Puzzle\n";
+    1;
 }
 
 int main()
@@ -52,6 +22,30 @@ int main()
     cout << "\n" << solve.num_backtrack_calls << " " << solve.num_guesses << "\n";
     */
 
-    benchmark();
+    std::vector<std::vector<int>> solutions;
+    std::vector<std::vector<int>> cover_matrix;
+
+    cover_matrix.push_back({0, 0}); cover_matrix.push_back({0, 3});
+    cover_matrix.push_back({0, 6}); cover_matrix.push_back({1, 0});
+    cover_matrix.push_back({1, 3}); cover_matrix.push_back({2, 3});
+    cover_matrix.push_back({2, 4}); cover_matrix.push_back({2, 6});
+    cover_matrix.push_back({3, 2}); cover_matrix.push_back({3, 4});
+    cover_matrix.push_back({3, 5}); cover_matrix.push_back({4, 1});
+    cover_matrix.push_back({4, 2}); cover_matrix.push_back({4, 5});
+    cover_matrix.push_back({4, 6}); cover_matrix.push_back({5, 1});
+    cover_matrix.push_back({5, 6}); cover_matrix.push_back({6, 0});
+    cover_matrix.push_back({6, 3});
+    
+    ExactCoverDancingLinks solve(cover_matrix);
+    solutions = solve.solutions_found;
+
+    for (int i = 0; i < solutions.size(); i++)
+    {
+        for (int j = 0; j < solutions[i].size(); j++)
+            std::cout << solutions[i][j] << " ";
+
+        std::cout << "\n";
+    }
+
     return 0;
 }

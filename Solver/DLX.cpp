@@ -5,6 +5,26 @@
 
 struct node
 {
+    /*
+    Node structure.
+
+    Atributes
+    ---------
+
+    value
+        Information about the node.
+    left
+        Pointer to the left node.
+    right
+        Pointer to the right node.
+    up
+        Pointer to the node above.
+    down
+        Pointer to the node below.
+    column_header
+        Pointer to the column header where the node belongs.
+    */
+    
     int value = 0;
 
     node *left  = nullptr;
@@ -16,18 +36,47 @@ struct node
 
 // -----------------------------------------------------------
 
-class createToroidalLinkedList
+class CreateToroidalLinkedList
 {
+    /*
+    This creates the doubly linked 2D list necessary for a DLX algorithm given the sparse matrix of the problem.
+    It is of extreme importance that the sparse matrix has row first defined order, 
+    otherwise, it will output wrong solutions. 
+
+    Atributes
+    ---------
+
+    head
+        Pointer of the head of the 2D Linked List.
+    sparse_cover_matrix
+        Exact cover matrix in sparse matrix format of the problem.
+    num_columns
+        Number of columns of the exact cover matrix.
+    FLAG
+        Just a flag variable to ensure the correct logic when creating the 2D Linked List.
+    
+
+    Methods
+    ---------
+
+    deallocateStructure()
+        Deletes from memory the 2D Linked List.
+    getNumProblemColumns()
+        Find the number of columns of the exact cover matrix provided.
+    addHead()
+        Creates the head of the 2D LL.
+    addNodeColumnHeader();
+        Created the column head of the 2D LL specific to the DLX algorithm.
+    addNodes();
+        Creates the nodes of the exact cover matrix.
+    */
+    
     public: 
 
     node *head = nullptr;
     std::vector<std::vector<int>> sparse_cover_matrix;
 
-    // -------------------------------------------------------
-    // The sparse matrix needs a defined order, always the rows first
-    // Initializer
-
-    createToroidalLinkedList(std::vector<std::vector<int>> (&cover_matrix_original))
+    CreateToroidalLinkedList(std::vector<std::vector<int>> (&cover_matrix_original))
 
     {
         sparse_cover_matrix = cover_matrix_original;
@@ -37,7 +86,7 @@ class createToroidalLinkedList
         addNodes();
     }
 
-    ~createToroidalLinkedList()
+    ~CreateToroidalLinkedList()
 
     {
         deallocateStructure();
@@ -49,10 +98,17 @@ class createToroidalLinkedList
     const int FLAG = -1;
 
     // -------------------------------------------------------
-    // Remove the structure from the memory
 
     void deallocateStructure()
     {
+        /*
+        Removes the structure from the memory.
+
+        Returns
+        ---------
+        None
+        */
+        
         if (head == nullptr)
             return;
 
@@ -77,10 +133,17 @@ class createToroidalLinkedList
     }
         
     // -------------------------------------------------------
-    // Find the number of columns of the problem
 
     void getNumProblemColumns()
     {
+        /*
+        Finds the number of columns from the sparse exact cover matrix.
+
+        Returns
+        ---------
+        None
+        */
+
         for (int i = 0; i < sparse_cover_matrix.size(); i++)
             if (sparse_cover_matrix[i][1] > num_columns)
                 num_columns = sparse_cover_matrix[i][1];
@@ -89,10 +152,17 @@ class createToroidalLinkedList
     }
 
     // -------------------------------------------------------
-    // Toroidal Linked List Creation
 
     void addHead()
     {
+        /*
+        Adds the head of the 2D LL.
+
+        Returns
+        ---------
+        None
+        */
+
         node *new_node = new node();
 
         head     = new_node;
@@ -104,6 +174,14 @@ class createToroidalLinkedList
 
     void addNodeColumnHeader()
     {
+        /*
+        Adds the columns heads of the 2D LL specific to the exact cover problem.
+
+        Returns
+        ---------
+        None
+        */
+
         node *current = head;
 
         for (int i = 0; i < num_columns; i++)
@@ -126,6 +204,14 @@ class createToroidalLinkedList
 
     void addNodes()
     {   
+        /*
+        Adds the nodes to the 2D LL from the sparse exact cover matrix.
+
+        Returns
+        ---------
+        None
+        */
+
         node *connect_col    = head;
         node *connect_row    = head;
         node *loop_row       = head;
@@ -174,13 +260,39 @@ class createToroidalLinkedList
 
 // -----------------------------------------------------------
 
-class exactCoverDancingLinks : createToroidalLinkedList
+class ExactCoverDancingLinks : CreateToroidalLinkedList
 {
+    /*
+    This solves the exact cover problem using the DLX algorithm. 
+    The 2D LL is inherited from the CreateToroidalLinkedList.
+
+    Atributes
+    ---------
+
+    solutions_found
+        Vector contanting all the solutions for the exact cover problem given.
+    solution
+        Vector contanting only one, and current, solution found.
+    
+
+    Methods
+    ---------
+
+    cover()
+        Removes an entire column and consecuent rows.
+    uncover()
+        Undoes an entire column and consecuent rows.
+    getMinCollumn()
+        Find the column with the least number of set rows.
+    dancingLinksAlgorithmX()
+        Performs the DLX algorithm to solve the exact cover problem.
+    */
+    
     public:
 
-    std::vector<std::vector<int>> solution_found;
+    std::vector<std::vector<int>> solutions_found;
 
-    exactCoverDancingLinks(std::vector<std::vector<int>> (&cover_matrix_original)) : createToroidalLinkedList(cover_matrix_original)
+    ExactCoverDancingLinks(std::vector<std::vector<int>> (&cover_matrix_original)) : CreateToroidalLinkedList(cover_matrix_original)
     
     {
         dancingLinksAlgorithmX();
@@ -195,6 +307,19 @@ class exactCoverDancingLinks : createToroidalLinkedList
 
     void cover(node *target)
     {
+        /*
+        Cover an entire column and subsecuent rows.
+
+        Parameters
+        ---------
+        target
+            pointer of the node to be removed.
+
+        Returns
+        ---------
+        None
+        */
+
         node *current_row = target->column_header;
         node *col_header  = target->column_header;
 
@@ -220,6 +345,19 @@ class exactCoverDancingLinks : createToroidalLinkedList
 
     void uncover(node *target)
     {
+        /*
+        Uncovers an entire column and subsecuent rows.
+
+        Parameters
+        ---------
+        target
+            pointer of the node to be reinstated.
+
+        Returns
+        ---------
+        None
+        */
+
         node *current_row = target->column_header;
         node *col_header  = target->column_header;
         
@@ -245,6 +383,14 @@ class exactCoverDancingLinks : createToroidalLinkedList
 
     node *getMinCollumn()
     {
+        /*
+        Finds the column with the least number of node of the problem..
+
+        Returns
+        ---------
+        node
+        */
+
         node *start   = head;
         node *min_col = head->right;
 
@@ -264,6 +410,14 @@ class exactCoverDancingLinks : createToroidalLinkedList
 
     void dancingLinksAlgorithmX(int depth = 0)
     {
+        /*
+        Performs the DLX algorithm.
+
+        Returns
+        ---------
+        None
+        */
+
         node *row_node;
         node *right_node;
         node *left_node;
@@ -271,7 +425,7 @@ class exactCoverDancingLinks : createToroidalLinkedList
 
         if (head->right == head)
         {
-            solution_found.push_back(solution);
+            solutions_found.push_back(solution);
             return;
         }
         
@@ -306,35 +460,3 @@ class exactCoverDancingLinks : createToroidalLinkedList
         uncover(column);
     }
 };
-
-// -----------------------------------------------------------
-
-int main() 
-{
-    std::vector<std::vector<int>> solutions;
-    std::vector<std::vector<int>> cover_matrix;
-
-    cover_matrix.push_back({0, 0}); cover_matrix.push_back({0, 3});
-    cover_matrix.push_back({0, 6}); cover_matrix.push_back({1, 0});
-    cover_matrix.push_back({1, 3}); cover_matrix.push_back({2, 3});
-    cover_matrix.push_back({2, 4}); cover_matrix.push_back({2, 6});
-    cover_matrix.push_back({3, 2}); cover_matrix.push_back({3, 4});
-    cover_matrix.push_back({3, 5}); cover_matrix.push_back({4, 1});
-    cover_matrix.push_back({4, 2}); cover_matrix.push_back({4, 5});
-    cover_matrix.push_back({4, 6}); cover_matrix.push_back({5, 1});
-    cover_matrix.push_back({5, 6}); cover_matrix.push_back({6, 0});
-    cover_matrix.push_back({6, 3});
-    
-    exactCoverDancingLinks solve(cover_matrix);
-    solutions = solve.solution_found;
-
-    for (int i = 0; i < solutions.size(); i++)
-    {
-        for (int j = 0; j < solutions[i].size(); j++)
-            std::cout << solutions[i][j] << " ";
-
-        std::cout << "\n";
-    }
-
-    return 0;
-}
