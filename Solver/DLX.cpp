@@ -5,8 +5,6 @@
 #include <memory>
 #include <unordered_set>
 
-using namespace std;
-
 #define NUM_COLS 7
 #define FLAG -1
 
@@ -20,7 +18,7 @@ struct node
     node *right = nullptr;
     node *up    = nullptr;
     node *down  = nullptr;
-    node *collumn_header = nullptr;
+    node *column_header = nullptr;
 };
 
 // -----------------------------------------------------------
@@ -30,13 +28,13 @@ class createToroidalLinkedList
     public: 
 
     node *head = nullptr;
-    vector<vector<int>> sparse_cover_matrix;
+    std::vector<std::vector<int>> sparse_cover_matrix;
 
     // -------------------------------------------------------
     // the sparse matrix needs a defined order, always the rows first
     // initializer
 
-    createToroidalLinkedList(vector<vector<int>> (&cover_matrix_original))
+    createToroidalLinkedList(std::vector<std::vector<int>> (&cover_matrix_original))
 
     {
         sparse_cover_matrix = cover_matrix_original;
@@ -48,14 +46,14 @@ class createToroidalLinkedList
         if (head == nullptr)
             return;
 
-        node* current_collumn = head;
+        node* current_column = head;
 
-        while (current_collumn->right != head)
+        while (current_column->right != head)
         {
-            current_collumn = current_collumn->right;
-            node* current_col = current_collumn;
+            current_column = current_column->right;
+            node* current_col = current_column;
 
-            while (current_col->down != current_collumn)
+            while (current_col->down != current_column)
             {
                 node *temp = current_col;
                 current_col = current_col->down;
@@ -92,7 +90,7 @@ class createToroidalLinkedList
         {
             node *new_node = new node();
 
-            new_node->collumn_header = new_node;
+            new_node->column_header = new_node;
 
             new_node->left        = current;
             new_node->right          = head;
@@ -108,9 +106,6 @@ class createToroidalLinkedList
 
     void addNodes()
     {   
-        // ---------------------------------------------------
-        //
-
         node *connect_col    = head;
         node *connect_row    = head;
         node *loop_row       = head;
@@ -129,8 +124,8 @@ class createToroidalLinkedList
                 current = current->right;
             
             connect_col = current;
-            new_node->collumn_header = connect_col;
-            new_node->collumn_header->value += 1;
+            new_node->column_header = connect_col;
+            new_node->column_header->value += 1;
 
             while (current->down != connect_col)
                 current = current->down;
@@ -164,13 +159,15 @@ class createToroidalLinkedList
     }
 };
 
+// -----------------------------------------------------------
+
 class exactCoverDancingLinks : createToroidalLinkedList
 {
     public:
 
-    vector<vector<int>> solution_found;
+    std::vector<std::vector<int>> solution_found;
 
-    exactCoverDancingLinks(vector<vector<int>> (&cover_matrix_original)) : createToroidalLinkedList(cover_matrix_original)
+    exactCoverDancingLinks(std::vector<std::vector<int>> (&cover_matrix_original)) : createToroidalLinkedList(cover_matrix_original)
     
     {
         DLX();
@@ -181,23 +178,23 @@ class exactCoverDancingLinks : createToroidalLinkedList
         for (int i = 0; i < solution_found.size(); i++)
         {
             for (int j = 0; j < solution_found[i].size(); j++)
-                cout << solution_found[i][j] << " ";
+                std::cout << solution_found[i][j] << " ";
 
-            cout << "\n";
+            std::cout << "\n";
         }
     }
-    
+
     private:
 
-    vector<int> solution;
+    std::vector<int> solution;
 
     // -------------------------------------------------------
     // DLX Helping Methods
 
     void cover(node *target)
     {
-        node *current_row = target->collumn_header;
-        node *col_header  = target->collumn_header;
+        node *current_row = target->column_header;
+        node *col_header  = target->column_header;
 
         col_header->left->right = col_header->right;
         col_header->right->left = col_header->left;
@@ -214,15 +211,15 @@ class exactCoverDancingLinks : createToroidalLinkedList
                 current_col->up->down = current_col->down;
                 current_col->down->up = current_col->up;
 
-                current_col->collumn_header->value -= 1;
+                current_col->column_header->value -= 1;
             }
         }
     }
 
     void uncover(node *target)
     {
-        node *current_row = target->collumn_header;
-        node *col_header  = target->collumn_header;
+        node *current_row = target->column_header;
+        node *col_header  = target->column_header;
         
         col_header->left->right = col_header;
         col_header->right->left = col_header;
@@ -239,7 +236,7 @@ class exactCoverDancingLinks : createToroidalLinkedList
                 current_col->up->down = current_col;
                 current_col->down->up = current_col;
 
-                current_col->collumn_header->value += 1;
+                current_col->column_header->value += 1;
             }
         }
     }
@@ -268,7 +265,7 @@ class exactCoverDancingLinks : createToroidalLinkedList
         node *row_node;
         node *right_node;
         node *left_node;
-        node *collumn;
+        node *column;
 
         if (head->right == head)
         {
@@ -276,11 +273,11 @@ class exactCoverDancingLinks : createToroidalLinkedList
             return;
         }
         
-        collumn = getMinCollumn();
-        row_node = collumn;
-        cover(collumn);
+        column = getMinCollumn();
+        row_node = column;
+        cover(column);
         
-        while (row_node->down != collumn)
+        while (row_node->down != column)
         {
             row_node = row_node->down;
             right_node = row_node;
@@ -304,7 +301,7 @@ class exactCoverDancingLinks : createToroidalLinkedList
             }
         }
 
-        uncover(collumn);
+        uncover(column);
     }
 
     void DLX()
@@ -318,7 +315,7 @@ class exactCoverDancingLinks : createToroidalLinkedList
 
 int main() 
 {
-    vector<vector<int>> cover_matrix;
+    std::vector<std::vector<int>> cover_matrix;
 
     cover_matrix.push_back({0, 0}); cover_matrix.push_back({0, 3});
     cover_matrix.push_back({0, 6}); cover_matrix.push_back({1, 0});
