@@ -1,12 +1,6 @@
-#include <algorithm>
 #include <iostream>
 #include <cstring>
 #include <vector>
-#include <memory>
-#include <unordered_set>
-
-#define NUM_COLS 7
-#define FLAG -1
 
 // -----------------------------------------------------------
 
@@ -31,15 +25,19 @@ class createToroidalLinkedList
     std::vector<std::vector<int>> sparse_cover_matrix;
 
     // -------------------------------------------------------
-    // the sparse matrix needs a defined order, always the rows first
-    // initializer
+    // The sparse matrix needs a defined order, always the rows first
+    // Initializer
 
     createToroidalLinkedList(std::vector<std::vector<int>> (&cover_matrix_original))
 
     {
         sparse_cover_matrix = cover_matrix_original;
+        getNumProblemColumns();
         fillLinkedList();
     }
+
+    // -------------------------------------------------------
+    // Remove the structure from the memory
 
     void deallocateStructure()
     {
@@ -68,6 +66,21 @@ class createToroidalLinkedList
         
     private:
 
+    int num_columns = 0;
+    const int FLAG = -1;
+
+    // -------------------------------------------------------
+    // Find the number of columns of the problem
+
+    void getNumProblemColumns()
+    {
+        for (int i = 0; i < sparse_cover_matrix.size(); i++)
+            if (sparse_cover_matrix[i][1] > num_columns)
+                num_columns = sparse_cover_matrix[i][1];
+
+        num_columns += 1;
+    }
+
     // -------------------------------------------------------
     // Toroidal Linked List Creation
 
@@ -86,7 +99,7 @@ class createToroidalLinkedList
     {
         node *current = head;
 
-        for (int i = 0; i < NUM_COLS; i++)
+        for (int i = 0; i < num_columns; i++)
         {
             node *new_node = new node();
 
@@ -189,7 +202,7 @@ class exactCoverDancingLinks : createToroidalLinkedList
     std::vector<int> solution;
 
     // -------------------------------------------------------
-    // DLX Helping Methods
+    // DLX methods
 
     void cover(node *target)
     {
