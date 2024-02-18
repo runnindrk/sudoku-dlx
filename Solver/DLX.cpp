@@ -30,8 +30,6 @@ class createToroidalLinkedList
     public: 
 
     node *head = nullptr;
-    vector<int> solution;
-    vector<vector<int>> solution_found;
     vector<vector<int>> sparse_cover_matrix;
 
     // -------------------------------------------------------
@@ -44,6 +42,33 @@ class createToroidalLinkedList
         sparse_cover_matrix = cover_matrix_original;
         fillLinkedList();
     }
+
+    void deallocateStructure()
+    {
+        if (head == nullptr)
+            return;
+
+        node* current_collumn = head;
+
+        while (current_collumn->right != head)
+        {
+            current_collumn = current_collumn->right;
+            node* current_col = current_collumn;
+
+            while (current_col->down != current_collumn)
+            {
+                node *temp = current_col;
+                current_col = current_col->down;
+                delete temp;
+            }
+
+            delete current_col;
+        }
+
+        delete head;
+    }
+        
+    private:
 
     // -------------------------------------------------------
     // Toroidal Linked List Creation
@@ -137,30 +162,18 @@ class createToroidalLinkedList
         addNodeColumnHeader();
         addNodes();
     }
+};
 
-    void deallocateStructure()
+class exactCoverDancingLinks : createToroidalLinkedList
+{
+    public:
+
+    vector<vector<int>> solution_found;
+
+    exactCoverDancingLinks(vector<vector<int>> (&cover_matrix_original)) : createToroidalLinkedList(cover_matrix_original)
+    
     {
-        if (head == nullptr)
-            return;
-
-        node* current_collumn = head;
-
-        while (current_collumn->right != head)
-        {
-            current_collumn = current_collumn->right;
-            node* current_col = current_collumn;
-
-            while (current_col->down != current_collumn)
-            {
-                node *temp = current_col;
-                current_col = current_col->down;
-                delete temp;
-            }
-
-            delete current_col;
-        }
-
-        delete head;
+        DLX();
     }
 
     void printSolutions()
@@ -173,6 +186,10 @@ class createToroidalLinkedList
             cout << "\n";
         }
     }
+    
+    private:
+
+    vector<int> solution;
 
     // -------------------------------------------------------
     // DLX Helping Methods
@@ -314,9 +331,8 @@ int main()
     cover_matrix.push_back({5, 6}); cover_matrix.push_back({6, 0});
     cover_matrix.push_back({6, 3});
     
-    createToroidalLinkedList toroidalLinkedList(cover_matrix);
-    toroidalLinkedList.DLX();
-    toroidalLinkedList.printSolutions();
+    exactCoverDancingLinks solve(cover_matrix);
+    solve.printSolutions();
 
     return 0;
 }
