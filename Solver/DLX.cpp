@@ -36,6 +36,17 @@ class createToroidalLinkedList
         fillLinkedList();
     }
 
+    ~createToroidalLinkedList()
+
+    {
+        deallocateStructure();
+    }
+
+    private:
+
+    int num_columns = 0;
+    const int FLAG = -1;
+
     // -------------------------------------------------------
     // Remove the structure from the memory
 
@@ -64,11 +75,6 @@ class createToroidalLinkedList
         delete head;
     }
         
-    private:
-
-    int num_columns = 0;
-    const int FLAG = -1;
-
     // -------------------------------------------------------
     // Find the number of columns of the problem
 
@@ -183,7 +189,7 @@ class exactCoverDancingLinks : createToroidalLinkedList
     exactCoverDancingLinks(std::vector<std::vector<int>> (&cover_matrix_original)) : createToroidalLinkedList(cover_matrix_original)
     
     {
-        DLX();
+        dancingLinksAlgorithmX();
     }
 
     void printSolutions()
@@ -316,18 +322,13 @@ class exactCoverDancingLinks : createToroidalLinkedList
 
         uncover(column);
     }
-
-    void DLX()
-    {
-        dancingLinksAlgorithmX();
-        deallocateStructure();
-    }
 };
 
 // -----------------------------------------------------------
 
 int main() 
 {
+    std::vector<std::vector<int>> solutions;
     std::vector<std::vector<int>> cover_matrix;
 
     cover_matrix.push_back({0, 0}); cover_matrix.push_back({0, 3});
@@ -341,8 +342,10 @@ int main()
     cover_matrix.push_back({5, 6}); cover_matrix.push_back({6, 0});
     cover_matrix.push_back({6, 3});
     
-    exactCoverDancingLinks solve(cover_matrix);
-    solve.printSolutions();
+    for (int i = 0; i < 10000000; i++)
+    {
+        exactCoverDancingLinks solve(cover_matrix);
+    }
 
     return 0;
 }
