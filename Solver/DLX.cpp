@@ -32,7 +32,9 @@ class createToroidalLinkedList
     {
         sparse_cover_matrix = cover_matrix_original;
         getNumProblemColumns();
-        fillLinkedList();
+        addHead();
+        addNodeColumnHeader();
+        addNodes();
     }
 
     ~createToroidalLinkedList()
@@ -168,13 +170,6 @@ class createToroidalLinkedList
             connect_row = connect_row->right;
         }
     }
-
-    void fillLinkedList()
-    {   
-        addHead();
-        addNodeColumnHeader();
-        addNodes();
-    }
 };
 
 // -----------------------------------------------------------
@@ -189,17 +184,6 @@ class exactCoverDancingLinks : createToroidalLinkedList
     
     {
         dancingLinksAlgorithmX();
-    }
-
-    void printSolutions()
-    {
-        for (int i = 0; i < solution_found.size(); i++)
-        {
-            for (int j = 0; j < solution_found[i].size(); j++)
-                std::cout << solution_found[i][j] << " ";
-
-            std::cout << "\n";
-        }
     }
 
     private:
@@ -342,7 +326,15 @@ int main()
     cover_matrix.push_back({6, 3});
     
     exactCoverDancingLinks solve(cover_matrix);
-    solve.printSolutions();
+    solutions = solve.solution_found;
+
+    for (int i = 0; i < solutions.size(); i++)
+    {
+        for (int j = 0; j < solutions[i].size(); j++)
+            std::cout << solutions[i][j] << " ";
+
+        std::cout << "\n";
+    }
 
     return 0;
 }
