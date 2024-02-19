@@ -31,7 +31,7 @@ struct node
     node *right = nullptr;
     node *up    = nullptr;
     node *down  = nullptr;
-    node *column_header = nullptr;
+    node *column_header  = nullptr;
 };
 
 // -----------------------------------------------------------
@@ -66,7 +66,7 @@ class CreateToroidalLinkedList
     addHead()
         Creates the head of the 2D LL.
     addNodeColumnHeader();
-        Created the column head of the 2D LL specific to the DLX algorithm.
+        Creates the column head of the 2D LL specific to the DLX algorithm.
     addNodes()
         Creates the nodes of the exact cover matrix.
     */
@@ -260,7 +260,7 @@ class CreateToroidalLinkedList
 
 // -----------------------------------------------------------
 
-class ExactCoverDancingLinks : CreateToroidalLinkedList
+class ExactCoverDancingLinks
 {
     /*
     This solves the exact cover problem using the DLX algorithm. 
@@ -290,16 +290,21 @@ class ExactCoverDancingLinks : CreateToroidalLinkedList
     
     public:
 
+    int number_backtrack_calls = 0;
+    int number_guesses = 0;
     std::vector<std::vector<int>> solutions_found;
 
-    ExactCoverDancingLinks(std::vector<std::vector<int>> (&cover_matrix_original)) : CreateToroidalLinkedList(cover_matrix_original)
+    ExactCoverDancingLinks(std::vector<std::vector<int>> (&cover_matrix_original))
     
     {
+        CreateToroidalLinkedList LinkedList(cover_matrix_original);
+        head = LinkedList.head;
         dancingLinksAlgorithmX();
     }
 
     private:
 
+    node *head = nullptr;
     std::vector<int> solution;
 
     // -------------------------------------------------------
@@ -360,17 +365,14 @@ class ExactCoverDancingLinks : CreateToroidalLinkedList
         node *current_row = target->column_header;
         node *col_header  = target->column_header;
         
-        col_header->left->right = col_header;
-        col_header->right->left = col_header;
-        
-        while (current_row->down != col_header)
+        while (current_row->up != col_header)
         {
-            current_row = current_row->down;
+            current_row = current_row->up;
             node *current_col = current_row;
 
-            while (current_col->right != current_row)
+            while (current_col->left != current_row)
             {
-                current_col = current_col->right;
+                current_col = current_col->left;
                 
                 current_col->up->down = current_col;
                 current_col->down->up = current_col;
@@ -378,6 +380,9 @@ class ExactCoverDancingLinks : CreateToroidalLinkedList
                 current_col->column_header->value += 1;
             }
         }
+
+        col_header->left->right = col_header;
+        col_header->right->left = col_header;
     }
 
     node *getMinColumn()
@@ -431,13 +436,14 @@ class ExactCoverDancingLinks : CreateToroidalLinkedList
         row_node = column;
         cover(column);
         
+        number_backtrack_calls += 1;
+        (column->value > 1) ? number_guesses += 1 : 1;
+        
         while (row_node->down != column)
         {
             row_node = row_node->down;
             right_node = row_node;
             left_node = row_node;
-
-            solution.push_back(row_node->value);
 
             while (right_node->right != row_node)
             {
@@ -445,7 +451,10 @@ class ExactCoverDancingLinks : CreateToroidalLinkedList
                 cover(right_node);
             }
 
+            solution.push_back(row_node->value);
+
             dancingLinksAlgorithmX(depth + 1);
+            
             solution.pop_back();
 
             while (left_node->left != row_node)
