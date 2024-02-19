@@ -67,7 +67,7 @@ class CreateToroidalLinkedList
         Creates the head of the 2D LL.
     addNodeColumnHeader();
         Created the column head of the 2D LL specific to the DLX algorithm.
-    addNodes();
+    addNodes()
         Creates the nodes of the exact cover matrix.
     */
     
@@ -303,7 +303,6 @@ class ExactCoverDancingLinks : CreateToroidalLinkedList
     std::vector<int> solution;
 
     // -------------------------------------------------------
-    // DLX methods
 
     void cover(node *target)
     {
@@ -381,7 +380,7 @@ class ExactCoverDancingLinks : CreateToroidalLinkedList
         }
     }
 
-    node *getMinCollumn()
+    node *getMinColumn()
     {
         /*
         Finds the column with the least number of node of the problem..
@@ -406,7 +405,6 @@ class ExactCoverDancingLinks : CreateToroidalLinkedList
     }
 
     // -------------------------------------------------------
-    // DLX
 
     void dancingLinksAlgorithmX(int depth = 0)
     {
@@ -429,7 +427,7 @@ class ExactCoverDancingLinks : CreateToroidalLinkedList
             return;
         }
         
-        column = getMinCollumn();
+        column = getMinColumn();
         row_node = column;
         cover(column);
         

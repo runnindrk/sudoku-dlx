@@ -1,4 +1,6 @@
-#include "DLX.cpp"
+#include "dlx.cpp"
+#include "sudoku_exact_cover_sparse_matrix.cpp"
+#include "sudoku_translator.cpp"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -8,44 +10,66 @@
 
 void benchmark()
 {
-    1;
+    int num_puzzles_solved = 0;
+    std::string sudoku;
+    std::ifstream file("../Data_Sets/puzzles5_forum_hardest_1905_11+");
+
+    if (!file.is_open()) 
+        std::cerr << "Failed to open the file.\n";
+
+    getline(file, sudoku);
+    getline(file, sudoku);
+
+    auto start = std::chrono::high_resolution_clock::now();
+
+    while (getline(file, sudoku))
+    {
+        std::vector<std::vector<int>> solutions;
+        std::vector<std::vector<int>> cover_matrix;
+        std::vector<std::vector<int>> row_meaning;
+
+        CreateSparseExactCoverMatrix create_matrix(sudoku);
+        cover_matrix = create_matrix.sparse_exact_cover_matrix;
+        row_meaning = create_matrix.sparse_exact_cover_row_meaning;
+
+        ExactCoverDancingLinks solve(cover_matrix);
+        solutions = solve.solutions_found;
+
+        SolutionTranslator translator(row_meaning, solutions);
+
+        num_puzzles_solved += 1;
+        //std::cout << num_puzzles_solved << " " << sudoku << "\n";
+    }
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start); 
+
+    file.close();
+
+    std::cout << "\n";
+    std::cout << num_puzzles_solved << " Solved Puzzles\n";
+    std::cout << static_cast<float>(num_puzzles_solved)/(duration.count()*1e-6) << " Puzzles/s\n";
 }
 
 int main()
 {
-    /*
-    string sudoku_string = "6..3.2....4.....8..........7.26............543.........8.15........8.2........7..";
-    solveSudoku solve(sudoku_string);
-    solve.printArrayOnTerminal(solve.sudoku);
-    solve.backTrackingSolver();
-    solve.printArrayOnTerminal(solve.sudoku_solution);
-    cout << "\n" << solve.num_backtrack_calls << " " << solve.num_guesses << "\n";
-    */
-
-    std::vector<std::vector<int>> solutions;
-    std::vector<std::vector<int>> cover_matrix;
-
-    cover_matrix.push_back({0, 0}); cover_matrix.push_back({0, 3});
-    cover_matrix.push_back({0, 6}); cover_matrix.push_back({1, 0});
-    cover_matrix.push_back({1, 3}); cover_matrix.push_back({2, 3});
-    cover_matrix.push_back({2, 4}); cover_matrix.push_back({2, 6});
-    cover_matrix.push_back({3, 2}); cover_matrix.push_back({3, 4});
-    cover_matrix.push_back({3, 5}); cover_matrix.push_back({4, 1});
-    cover_matrix.push_back({4, 2}); cover_matrix.push_back({4, 5});
-    cover_matrix.push_back({4, 6}); cover_matrix.push_back({5, 1});
-    cover_matrix.push_back({5, 6}); cover_matrix.push_back({6, 0});
-    cover_matrix.push_back({6, 3});
+    // std::string sudoku_string = "6..3.2....4.....8..........7.26............543.........8.15........8.2........7..";
     
-    ExactCoverDancingLinks solve(cover_matrix);
-    solutions = solve.solutions_found;
+    // std::vector<std::vector<int>> solutions;
+    // std::vector<std::vector<int>> cover_matrix;
+    // std::vector<std::vector<int>> row_meaning;
 
-    for (int i = 0; i < solutions.size(); i++)
-    {
-        for (int j = 0; j < solutions[i].size(); j++)
-            std::cout << solutions[i][j] << " ";
+    // CreateSparseExactCoverMatrix create_matrix(sudoku_string);
+    // cover_matrix = create_matrix.sparse_exact_cover_matrix;
+    // row_meaning = create_matrix.sparse_exact_cover_row_meaning;
+    
+    // ExactCoverDancingLinks solve(cover_matrix);
+    // solutions = solve.solutions_found;
 
-        std::cout << "\n";
-    }
+    // SolutionTranslator translator(row_meaning, solutions);
+    // translator.printArrayOnTerminal();
+
+    benchmark();
 
     return 0;
 }
