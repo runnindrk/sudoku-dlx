@@ -2,6 +2,7 @@
 #include "sudoku_exact_cover_sparse_matrix.cpp"
 #include "sudoku_translator.cpp"
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <string>
 #include <chrono>
@@ -24,6 +25,8 @@ void benchmark()
 
     while (getline(file, sudoku))
     {
+        auto start_puzzle = std::chrono::high_resolution_clock::now();
+
         std::vector<std::vector<int>> solutions;
         std::vector<std::vector<int>> cover_matrix;
         std::vector<std::vector<int>> row_meaning;
@@ -37,8 +40,11 @@ void benchmark()
 
         SolutionTranslator translator(row_meaning, solutions);
 
+        auto end_puzzle = std::chrono::high_resolution_clock::now();
+        auto duration_puzzle = std::chrono::duration_cast<std::chrono::microseconds>(end_puzzle - start_puzzle); 
+        
         num_puzzles_solved += 1;
-        //std::cout << num_puzzles_solved << " " << sudoku << "\n";
+        std::cout << num_puzzles_solved << " " << std::setw(10) << duration_puzzle.count() << " " << sudoku << "\n";
     }
 
     auto end = std::chrono::high_resolution_clock::now();
