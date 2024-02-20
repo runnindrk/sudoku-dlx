@@ -312,7 +312,7 @@ class ExactCoverDancingLinks
     void cover(node *target)
     {
         /*
-        Cover an entire column and subsecuent rows.
+        Cover an entire column and subsequent rows.
 
         Parameters
         ---------
@@ -350,7 +350,7 @@ class ExactCoverDancingLinks
     void uncover(node *target)
     {
         /*
-        Uncovers an entire column and subsecuent rows.
+        Uncovers an entire column and subsequent rows.
 
         Parameters
         ---------

@@ -38,7 +38,7 @@ void benchmark()
 
         ExactCoverDancingLinks solve(cover_matrix);
         solutions = solve.solutions_found;
-
+        
         SolutionTranslator translator(row_meaning, solutions);
         
         auto end_puzzle = std::chrono::high_resolution_clock::now();
@@ -46,8 +46,8 @@ void benchmark()
         
         avg_number_guesses += static_cast<float>(solve.number_guesses - avg_number_guesses)/(num_puzzles_solved + 1.0);
         num_puzzles_solved += 1;
-
-        std::cout << num_puzzles_solved << " " << std::setw(6) << duration_puzzle.count() << std::setw(6) << solve.number_backtrack_calls << std::setw(6) << solve.number_guesses << " " << sudoku << "\n";
+        
+        std::cout << num_puzzles_solved << " " << std::setw(6) << duration_puzzle.count() << " " << std::setw(6) << solve.number_backtrack_calls << std::setw(6) << solve.number_guesses << " " << sudoku << "\n";
     }
 
     auto end = std::chrono::high_resolution_clock::now();

@@ -24,7 +24,6 @@ class CreateSparseExactCoverMatrix
     
     {
         fillInternalRepresentation(sudoku_string, sudoku);
-        fillCellPeers();
         setAllPossileValues();
         fillSparseExactCoverMatrix();
     }
@@ -56,68 +55,42 @@ class CreateSparseExactCoverMatrix
 
     // -------------------------------------------------------
 
-    std::set<std::array<int, 2>> findCellPeers(int col, int row)
+    void setCellPossibleValues(int row, int col)
     {
+        int all_values = 0;
         int row_block = row/SIZE_BLOCKS;
         int col_block = col/SIZE_BLOCKS;
-        std::set<std::array<int, 2>> peers;
-
-        for (int i = 0; i < NUM_ROWS; i++)
-            peers.insert({col, i});
+        int peer_value = ALL_BITS;
 
         for (int i = 0; i < NUM_COLS; i++)
-            peers.insert({i, row});
+        {
+            int base_value = 1;
+            int cell_value = sudoku[row][i];
+
+            if (cell_value)
+                all_values = all_values | (base_value <<= (cell_value - 1));
+        }
+
+        for (int i = 0; i < NUM_ROWS; i++)
+        {
+            int base_value = 1;
+            int cell_value = sudoku[i][col];
+
+            if (cell_value)
+                all_values = all_values | (base_value <<= (cell_value - 1));
+        }
 
         for (int i = 0; i < SIZE_BLOCKS; i++)
             for (int j = 0; j < SIZE_BLOCKS; j++)
-                peers.insert({col_block*SIZE_BLOCKS + i, row_block*SIZE_BLOCKS + j});
-
-        peers.erase({col, row});
-
-        return peers;         
-    }
-
-    void fillCellPeers()
-    {
-        std::array<std::array<int, 2>, NUMBER_OF_PEERS> peers_array;
-
-        for (int i = 0; i < NUM_ROWS; i++)
-            for (int j = 0; j < NUM_COLS; j++)
             {
-                std::set<std::array<int, 2>> peers = findCellPeers(i, j);
-                auto it = peers.begin();
+                int base_value = 1;
+                int cell_value = sudoku[row_block*SIZE_BLOCKS + i][col_block*SIZE_BLOCKS + j];
 
-                for (int i = 0; i < peers.size(); ++i)
-                {
-                    peers_array[i] = *it;
-                    ++it;
-                }
-
-                cell_peers[{i, j}] = peers_array;
+                if (cell_value)
+                    all_values = all_values | (base_value <<= (cell_value - 1));
             }
-    }
 
-    // -------------------------------------------------------
-
-    void setCellPossibleValues(int col, int row)
-    {
-        std::array<std::array<int, 2>, NUMBER_OF_PEERS> peers = cell_peers.find({col, row})->second;
-        int base_value = 1;
-        int all_values = 0;
-        int peer_value = ALL_BITS;
-
-        for (int i = 0; i < NUMBER_OF_PEERS; i++)
-        {
-            int cell_value = sudoku[peers[i][0]][peers[i][1]];
-
-            if (cell_value)
-            {
-                all_values = all_values | (base_value <<= (cell_value - 1));
-                base_value = 1;
-            }
-        }
-
-        possible_values[col][row] = peer_value ^ all_values;;
+        possible_values[row][col] = peer_value ^ all_values;
     }
 
     void setAllPossileValues()
