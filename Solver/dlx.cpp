@@ -113,20 +113,30 @@ class CreateToroidalLinkedList
             return;
 
         node* current_column = head;
-
-        while (current_column->right != head)
+        node* temp;
+        
+        while (head->right != head)
         {
-            current_column = current_column->right;
+            current_column = head->right;
             node* current_col = current_column;
 
-            while (current_col->down != current_column)
+            while (current_column->down != current_column)
             {
-                node *temp = current_col;
-                current_col = current_col->down;
+                current_col = current_column->down;
+                temp = current_col;
+
+                current_col->up->down = current_col->down;
+                current_col->down->up = current_col->up;
+
                 delete temp;
             }
 
-            delete current_col;
+            temp = current_column;
+            
+            current_column->left->right = current_column->right;
+            current_column->right->left = current_column->left;
+
+            delete temp;
         }
 
         delete head;
